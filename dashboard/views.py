@@ -4,9 +4,8 @@ from django.views.generic import View
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .mixin import LoginRequired
-from user_profile.models import UserDetail, UserPost
-from .forms import UserPostForm
-# Create your views here.
+from userprofile.models import UserProfile
+# # Create your views here.
 
 
 class DashboardView(LoginRequired, View):
@@ -27,7 +26,7 @@ class RegisterView(View):
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-        user = User(first_name = first_name, last_name = last_name, username = username, email = email)
+        user = UserProfile.objects.create_user(first_name = first_name, last_name = last_name, username = username, email = email)
         user.set_password(password)
         user.save()
         return redirect('login')
@@ -56,9 +55,9 @@ class LogoutView(View):
         
 class UserFeedView(LoginRequired, View):
     def get(self, request):
-        posts = UserPost.objects.all()
+        user = request.user
         context = {
-            'posts' : posts
+            'user' : user
         }
         return render(request, 'dashboard/userFeed.html', context)
 
@@ -68,10 +67,6 @@ class CreatePostView(LoginRequired, View):
         return render(request, 'dashboard/createPost.html')
 
     def post(self, request):
-        user = request.user
-        post_description = request.POST['post_description']
-        post = UserPost(user = user, post_description = post_description)
-        post.save()
         return redirect('userFeed')
 
 

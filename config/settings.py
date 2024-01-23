@@ -33,7 +33,8 @@ ALLOWED_HOSTS = []
 
 DEV_APPS = [
     'dashboard',
-    'user_profile'
+    'userprofile',
+    'useraction'
 ]
 
 INSTALLED_APPS = [
@@ -105,6 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+AUTH_USER_MODEL = 'userprofile.UserProfile'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class UserProfileConfig(AppConfig):
+class UseractionConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'user_profile'
+    name = 'useraction'
