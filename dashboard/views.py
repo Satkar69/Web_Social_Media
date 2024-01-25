@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .mixin import LoginRequired
 from userprofile.models import UserProfile
+from useraction.models import Post, PostBid, PostComment, PostReaction
+from .forms import *
 # # Create your views here.
 
 
@@ -55,18 +57,28 @@ class LogoutView(View):
         
 class UserFeedView(LoginRequired, View):
     def get(self, request):
-        user = request.user
+        posts = Post.objects.all()
+        reactons = PostReaction.objects.all()
         context = {
-            'user' : user
+            'posts' : posts,
+            'reactions' : reactons
         }
         return render(request, 'dashboard/userFeed.html', context)
-
+    
+    def post(self, request):
+        pass
+    
 
 class CreatePostView(LoginRequired, View):
     def get(self, request):
         return render(request, 'dashboard/createPost.html')
 
     def post(self, request):
+        added_by = request.user
+        description = request.POST['description']
+        media = request.FILES['media']
+        post = Post(added_by = added_by, description = description, media = media)
+        post.save()
         return redirect('userFeed')
 
 

@@ -1,10 +1,8 @@
 from django.forms import ModelForm
-# from user_profile.models import UserPost
+from useraction.models import *
 
 
-
-# class UserPostForm(ModelForm):
-#     class Meta:
-#         model = UserPost
-#         fields = '__all__'
-        
+class CreatePostForm(ModelForm):
+    class Meta:
+        model = Post
+        fields ='__all__'
