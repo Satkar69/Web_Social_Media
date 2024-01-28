@@ -57,16 +57,26 @@ class LogoutView(View):
         
 class UserFeedView(LoginRequired, View):
     def get(self, request):
+        user = request.user
         posts = Post.objects.all()
-        reactons = PostReaction.objects.all()
+        reactions = PostReaction.objects.filter(is_liked = True)
+        reacted_posts = PostReaction.objects.filter(reacted_by = user)
+        # reaction_count = sum(1 for j in reactions for i in posts if j.post.id == i.id)
         context = {
             'posts' : posts,
-            'reactions' : reactons
+            'reactions' : reactions,
+            'reacted_posts' : reacted_posts,
+            # 'reaction_count' : reaction_count
         }
         return render(request, 'dashboard/userFeed.html', context)
     
     def post(self, request):
-        pass
+        reaction_id = request.POST.get('reacted_id')
+        reaction = PostReaction.objects.get(id = reaction_id)
+        if request.POST['form'] == 'reaction':
+            reaction.is_liked = not reaction.is_liked   
+            reaction.save()
+        return redirect('userFeed')
     
 
 class CreatePostView(LoginRequired, View):
@@ -76,11 +86,13 @@ class CreatePostView(LoginRequired, View):
     def post(self, request):
         added_by = request.user
         description = request.POST['description']
-        media = request.FILES['media']
-        post = Post(added_by = added_by, description = description, media = media)
+        if 'media' in request.FILES:
+            media = request.FILES['media']
+            post = Post(added_by = added_by, description = description, media = media)
+        else:
+            post = Post(added_by = added_by, description = description)
         post.save()
         return redirect('userFeed')
-
 
 
 

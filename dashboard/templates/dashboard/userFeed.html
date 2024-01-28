@@ -61,6 +61,10 @@
             .like-btn label .bx.bxs-like {
             font-size: 24px; /* Adjust size */
         }
+
+        #like-submit {
+        display: none;
+    }
         </style>
 
 
@@ -147,19 +151,22 @@
                                 <!-- Reactions -->
                                 <div class="argon-reaction">
                                     <form action="" method="post">
+                                        {% csrf_token %}
                                         <span class="like-btn">
                                             <input type="hidden" name="form" value="reaction">
-                                                {% for reaction in reactions%}
-                                                    <input type="checkbox" name="is_liked" id="like"
-                                                    {% if reaction.post.id == post.id %}
-                                                        {% if reaction.is_liked %} checked {% endif %}
+                                                {% for reacted in reacted_posts %}
+                                                    {% if reacted.post.id == post.id %}
+                                                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                                                        <input type="hidden" name="reacted_id" value="{{reacted.id}}">
+                                                        <input type="checkbox" name="is_liked" id="like" value="{{reaction.is_liked}}" {% if reacted.is_liked %} checked {% endif %}>
                                                     {% endif %}
-                                                    >
                                                 {% endfor %}
                                                 <label for="like"><i class='bx bxs-like mr-2'></i></label>
-                                            </span>
-                                        </form>
-                                    </div>
+
+                                                <button type="submit" id="like-submit"></button>
+                                        </span>
+                                    </form>
+                                </div>
         
                                 <a href="javascript:void(0)" class="post-card-buttons" id="show-comments"><i class='bx bx-message-rounded mr-2'></i> 5</a>
                                 <div class="dropdown dropup share-dropup">
@@ -326,5 +333,10 @@
                     icon.style.color = 'black';
                 }
             });
+
+            document.getElementById("like").addEventListener("click", function() {
+            document.getElementById("like-submit").click();
+        });
+            
         </script>
 {% endblock  %}
