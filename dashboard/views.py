@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .mixin import LoginRequired
 from userprofile.models import UserProfile
-from useraction.models import Post, PostBid, PostComment, PostReaction
+from useraction.models import Post, PostApply, PostComment, PostReaction
+from django.core.exceptions import ObjectDoesNotExist
+
 from .forms import *
 # # Create your views here.
 
@@ -59,23 +61,32 @@ class UserFeedView(LoginRequired, View):
     def get(self, request):
         user = request.user
         posts = Post.objects.all()
-        reactions = PostReaction.objects.filter(is_liked = True)
+        reactions = PostReaction.objects.all()
+        new_reactions = [reaction.post.id for reaction in reactions if reaction.reacted_by == user ]
         reacted_posts = PostReaction.objects.filter(reacted_by = user)
-        # reaction_count = sum(1 for j in reactions for i in posts if j.post.id == i.id)
+        print(new_reactions)
         context = {
+            'user' : user,
             'posts' : posts,
             'reactions' : reactions,
             'reacted_posts' : reacted_posts,
-            # 'reaction_count' : reaction_count
+            'new_reactions' : new_reactions
         }
         return render(request, 'dashboard/userFeed.html', context)
     
     def post(self, request):
-        reaction_id = request.POST.get('reacted_id')
-        reaction = PostReaction.objects.get(id = reaction_id)
-        if request.POST['form'] == 'reaction':
-            reaction.is_liked = not reaction.is_liked   
-            reaction.save()
+        user = request.user
+        post_id = request.POST.get('post_id')
+        reaction = PostReaction.objects.get(post = post_id)
+        print(reaction.reacted_by)
+        if request.POST['form-num'] == '1':
+            if request.POST['form'] == 'reaction':
+                reaction.is_liked = not reaction.is_liked   
+                reaction.save()
+        elif request.POST['form-num'] == '2':
+            post = Post.objects.get(id = post_id)
+            new_reaction = PostReaction(reacted_by = user, post = post, is_liked = True)
+            new_reaction.save()
         return redirect('userFeed')
     
 
@@ -91,9 +102,21 @@ class CreatePostView(LoginRequired, View):
             post = Post(added_by = added_by, description = description, media = media)
         else:
             post = Post(added_by = added_by, description = description)
+        
         post.save()
+        latest_post = Post.objects.all().last()
+        latest_post_id= latest_post.id
+        latest_post_added_by = latest_post.added_by
+        CreateReactionView.create_reaction(latest_post_id, latest_post_added_by)
         return redirect('userFeed')
 
+
+class CreateReactionView:
+    def create_reaction(post_id, reacted_by):
+        post = Post.objects.get(id = post_id)
+        reaction = PostReaction(reacted_by = reacted_by, post = post, is_liked = False)
+        return reaction.save()
+    
 
 
 

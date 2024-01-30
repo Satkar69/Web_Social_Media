@@ -23,9 +23,9 @@ class PostComment(models.Model):
         return self.commented_by.username
 
 
-class PostBid(models.Model):
-    bid_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+class PostApply(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    applied_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     is_approved = models.BooleanField(default=False)
 
     def __str__(self) -> str:

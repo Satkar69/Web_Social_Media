@@ -62,18 +62,26 @@
             font-size: 24px; /* Adjust size */
         }
 
-        #like-submit {
-        display: none;
-    }
+        .like-btn.liked {
+            color: blue;
+        }
+
+        .like-btn {
+            color: grey;
+        }
+        .not-liked {
+            color: grey; 
+        }
+      
         </style>
 
 
 
 
         <!-- Posts -->
-            {% for post in posts %}
-                    <div class="posts-section mb-5">
-                        <div class="post border-bottom p-3 bg-white w-shadow">
+        {% for post in posts %}
+        <div class="posts-section mb-5">
+            <div class="post border-bottom p-3 bg-white w-shadow">
                             <div class="media text-muted pt-3">
                                     <img src="{% if post.added_by.profile_picture %}{{post.added_by.profile_picture.url}}{% endif %}" alt="Online user" class="mr-3 post-user-image">
                                 <div class="media-body pb-3 mb-0 small lh-125">
@@ -150,193 +158,50 @@
                                 
                                 <!-- Reactions -->
                                 <div class="argon-reaction">
-                                    <form action="" method="post">
+                                    <!-- {% comment %} <form action="" method="post" id="form-post-{{post.id}}">
                                         {% csrf_token %}
+                                        <input type="hidden" name="form-num" value="1">
                                         <span class="like-btn">
                                             <input type="hidden" name="form" value="reaction">
-                                                {% for reacted in reacted_posts %}
-                                                    {% if reacted.post.id == post.id %}
-                                                        <input type="hidden" name="post_id" value="{{ post.id }}">
-                                                        <input type="hidden" name="reacted_id" value="{{reacted.id}}">
-                                                        <input type="checkbox" name="is_liked" id="like" value="{{reaction.is_liked}}" {% if reacted.is_liked %} checked {% endif %}>
-                                                    {% endif %}
-                                                {% endfor %}
-                                                <label for="like"><i class='bx bxs-like mr-2'></i></label>
-
-                                                <button type="submit" id="like-submit"></button>
+                                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                                            <button type="submit" class="sumbit-label" >
+                                                <i class='like-btn bx bxs-like mr-2 {% for reacted in reacted_posts %} {% if reacted.post.id == post.id and reacted.reacted_by == user and reacted.is_liked %} liked {% endif %} {% endfor %}' ></i>
+                                            </button>
                                         </span>
-                                    </form>
-                                </div>
-        
-                                <a href="javascript:void(0)" class="post-card-buttons" id="show-comments"><i class='bx bx-message-rounded mr-2'></i> 5</a>
-                                <div class="dropdown dropup share-dropup">
-                                    <a href="#" class="post-card-buttons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class='bx bx-share-alt mr-2'></i> Share
-                                    </a>
-                                    <div class="dropdown-menu post-dropdown-menu">
-                                        <a href="#" class="dropdown-item">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <i class='bx bx-share-alt'></i>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <span>Share Now (Public)</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#" class="dropdown-item">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <i class='bx bx-share-alt'></i>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <span>Share...</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#" class="dropdown-item">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <i class='bx bx-message'></i>
-                                                </div>
-                                                <div class="col-md-10">
-                                                    <span>Send as Message</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
+                                    </form> {% endcomment %} -->
+                                    
+                                    {% if post.id in new_reactions %}
+                                        <form action="" method="post" id="form-post-{{post.id}}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form-num" value="1">
+                                            <span class="like-btn">
+                                                <input type="hidden" name="form" value="reaction">
+                                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                                <button type="submit" class="sumbit-label" >
+                                                    <i class='like-btn bx bxs-like mr-2 {% for reacted in reacted_posts %} {% if reacted.post.id == post.id and reacted.reacted_by == user and reacted.is_liked %} liked {% endif %} {% endfor %}' ></i>
+                                                </button>
+                                            </span>
+                                        </form>
+                                    {% else %}
+                                        <form action="" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form-num" value="2">
+                                            <span class="like-btn">
+                                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                                <button type="submit" class="sumbit-label" >
+                                                    <i class='like-btn bx bxs-like mr-2 unliked' ></i>
+                                                </button>
+                                            </span>
+                                        </form>
+                                    {% endif %} 
                                 </div>
                             </div>
-                            <div class="border-top pt-3 hide-comments" style="display: none;">
-                                <div class="row bootstrap snippets">
-                                    <div class="col-md-12">
-                                        <div class="comment-wrapper">
-                                            <div class="panel panel-info">
-                                                <div class="panel-body">
-                                                    <ul class="media-list comments-list">
-                                                        <li class="media comment-form">
-                                                            <a href="#" class="pull-left">
-                                                                <img src="{% static 'dashboard/internal/assets/images/users/user-4.jpg' %}" alt="" class="img-circle">
-                                                            </a>
-                                                            <div class="media-body">
-                                                                <form action="" method="" role="form">
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <div class="input-group">
-                                                                                <input type="text" class="form-control comment-input" placeholder="Write a comment...">
-
-                                                                                <div class="input-group-btn">
-                                                                                    <button type="button" class="btn comment-form-btn" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><i class='bx bxs-smiley-happy'></i></button>
-                                                                                    <button type="button" class="btn comment-form-btn comment-form-btn" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><i class='bx bx-camera'></i></button>
-                                                                                    <button type="button" class="btn comment-form-btn comment-form-btn" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><i class='bx bx-microphone'></i></button>
-                                                                                    <button type="button" class="btn comment-form-btn" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><i class='bx bx-file-blank'></i></button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </li>
-                                                        <li class="media">
-                                                            <a href="#" class="pull-left">
-                                                                <img src="{% static 'dashboard/internal/assets/images/users/user-2.jpg' %}" alt="" class="img-circle">
-                                                            </a>
-                                                            <div class="media-body">
-                                                                <div class="d-flex justify-content-between align-items-center w-100">
-                                                                    <strong class="text-gray-dark"><a href="#" class="fs-8">Karen Minas</a></strong>
-                                                                    <a href="#"><i class='bx bx-dots-horizontal-rounded'></i></a>
-                                                                </div>
-                                                                <span class="d-block comment-created-time">30 min ago</span>
-                                                                <p class="fs-8 pt-2">
-                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                                                    Lorem ipsum dolor sit amet, <a href="#">#consecteturadipiscing </a>.
-                                                                </p>
-                                                                <div class="commentLR">
-                                                                    <button type="button" class="btn btn-link fs-8">Like</button>
-                                                                    <button type="button" class="btn btn-link fs-8">Reply</button>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                        <!-- <li class="media">
-                                                            <a href="#" class="pull-left">
-                                                                <img src="https://bootdey.com/img/Content/user_2.jpg" alt="" class="img-circle">
-                                                            </a>
-                                                            <div class="media-body">
-                                                                <div class="d-flex justify-content-between align-items-center w-100">
-                                                                    <strong class="text-gray-dark"><a href="#" class="fs-8">Lia Earnest</a></strong>
-                                                                    <a href="#"><i class='bx bx-dots-horizontal-rounded'></i></a>
-                                                                </div>
-                                                                <span class="d-block comment-created-time">2 hours ago</span>
-                                                                <p class="fs-8 pt-2">
-                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                                                    Lorem ipsum dolor sit amet, <a href="#">#consecteturadipiscing </a>.
-                                                                </p>
-                                                                <div class="commentLR">
-                                                                    <button type="button" class="btn btn-link fs-8">Like</button>
-                                                                    <button type="button" class="btn btn-link fs-8">Reply</button>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                        <li class="media">
-                                                            <a href="#" class="pull-left">
-                                                                <img src="https://bootdey.com/img/Content/user_3.jpg" alt="" class="img-circle">
-                                                            </a>
-                                                            <div class="media-body">
-                                                                <div class="d-flex justify-content-between align-items-center w-100">
-                                                                    <strong class="text-gray-dark"><a href="#" class="fs-8">Rusty Mickelsen</a></strong>
-                                                                    <a href="#"><i class='bx bx-dots-horizontal-rounded'></i></a>
-                                                                </div>
-                                                                <span class="d-block comment-created-time">17 hours ago</span>
-                                                                <p class="fs-8 pt-2">
-                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                                                    Lorem ipsum dolor sit amet, <a href="#">#consecteturadipiscing </a>.
-                                                                </p>
-                                                                <div class="commentLR">
-                                                                    <button type="button" class="btn btn-link fs-8">Like</button>
-                                                                    <button type="button" class="btn btn-link fs-8">Reply</button>
-                                                                </div>
-                                                            </div>
-                                                        </li> -->
-                                                        <li class="media">
-                                                            <div class="media-body">
-                                                                <div class="comment-see-more text-center">
-                                                                    <button type="button" class="btn btn-link fs-8">See More</button>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
-            {% endfor %}
+                    {% endfor %}
         <div class="d-flex justify-content-center my-5 load-post">
             <button type="button" class="btn btn-quick-link join-group-btn border shadow" data-toggle="tooltip" data-placement="top" data-title="Load More Post"><i class='bx bx-dots-horizontal-rounded'></i></button>
         </div>
 
-        <script>
-            // Get the checkbox element
-            var checkbox = document.getElementById('like');
-    
-            // Add event listener to the checkbox
-            checkbox.addEventListener('change', function() {
-                // Toggle the color of the icon when checkbox is checked
-                var icon = document.querySelector('.like-btn label i');
-                if (this.checked) {
-                    icon.style.color = 'blue';
-                } else {
-                    icon.style.color = 'black';
-                }
-            });
-
-            document.getElementById("like").addEventListener("click", function() {
-            document.getElementById("like-submit").click();
-        });
-            
-        </script>
 {% endblock  %}
