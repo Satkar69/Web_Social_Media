@@ -1,0 +1,131 @@
+{% extends "dashboard/base.html" %}
+
+{% block container %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylish Datatable</title>
+<style>
+  /* Resetting default styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    color: #333;
+    text-transform: uppercase;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  tr:hover {
+    background-color: #e2e2e2;
+  }
+
+  .datatable-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+  }
+
+  .datatable-header {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .datatable-body {
+    padding: 15px;
+  }
+
+  .datatable-footer {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+
+  .btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="datatable-container">
+  <div class="datatable-header">Chats</div>
+  <div class="datatable-body">
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>For Post </th>
+          <th>Applied_by</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for chat in filtered_chats %}
+          <tr>
+              <td>{{chat.message_by.id}}</td>
+              <td>{{chat.post}}</td>
+              <td>{{chat.message_by}}</td>
+              <td>
+                <a href="/userChat/{{chat.post.id}}/{{chat.applicant.id}}">
+                  <button>
+                    Message
+                  </button>
+                </a>
+              </td>
+          </tr>
+        {% endfor %}
+        <!-- Add more rows as needed -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+{% endblock container %}

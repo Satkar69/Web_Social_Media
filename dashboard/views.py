@@ -11,13 +11,19 @@ from django.core.exceptions import ObjectDoesNotExist
 from .forms import *
 # # Create your views here.
 
+class CustomVariables:
+    pass
 
 class DashboardView(LoginRequired, View):
     def get(self, request):
-        if request.user.is_superuser:
+        user = request.user
+        if user.is_superuser:
             return render(request, 'dashboard/base.html', {'msg' : 'This is admin'})
         else:
-            return redirect('userFeed')
+            context = {
+                'user' : user,
+            }
+            return render(request, 'dashboard/base.html', context)
         
 
 class RegisterView(View):
@@ -73,20 +79,23 @@ class UserFeedView(LoginRequired, View):
             'new_reactions' : new_reactions
         }
         return render(request, 'dashboard/userFeed.html', context)
-    
+     
     def post(self, request):
         user = request.user
-        post_id = request.POST.get('post_id')
-        reaction = PostReaction.objects.get(post = post_id)
-        print(reaction.reacted_by)
         if request.POST['form-num'] == '1':
-            if request.POST['form'] == 'reaction':
-                reaction.is_liked = not reaction.is_liked   
-                reaction.save()
-        elif request.POST['form-num'] == '2':
+            post_id = request.POST.get('post_id')
             post = Post.objects.get(id = post_id)
-            new_reaction = PostReaction(reacted_by = user, post = post, is_liked = True)
-            new_reaction.save()
+            reaction, created = PostReaction.objects.get_or_create(post = post, reacted_by = user)
+            if created:
+                reaction.is_liked = True
+            else:
+                reaction.is_liked = not reaction.is_liked
+            reaction.save()
+        elif request.POST['form-num'] == '2':
+            post_id = request.POST.get('post_id')
+            post = Post.objects.get(id = post_id)
+            apply = PostApply(post = post, applied_by = user)
+            apply.save()
         return redirect('userFeed')
     
 
@@ -102,22 +111,101 @@ class CreatePostView(LoginRequired, View):
             post = Post(added_by = added_by, description = description, media = media)
         else:
             post = Post(added_by = added_by, description = description)
-        
+               
         post.save()
-        latest_post = Post.objects.all().last()
-        latest_post_id= latest_post.id
-        latest_post_added_by = latest_post.added_by
-        CreateReactionView.create_reaction(latest_post_id, latest_post_added_by)
         return redirect('userFeed')
 
 
-class CreateReactionView:
-    def create_reaction(post_id, reacted_by):
-        post = Post.objects.get(id = post_id)
-        reaction = PostReaction(reacted_by = reacted_by, post = post, is_liked = False)
-        return reaction.save()
     
+class ApplicantsView(View):
+    def get(self, request):
+        user = request.user
+        applicants = [applicant for applicant in PostApply.objects.all() if applicant.applied_by != user]
+        filtered_applicants = []
+        unique_post_ids = set()
+        for applicant in applicants:
+            post_id = applicant.post.id
+            if post_id not in unique_post_ids:
+                unique_post_ids.add(post_id)
+                filtered_applicants.append(applicant)
+        context = {
+            'filtered_applicants' : filtered_applicants
+        }
+        return render(request, 'dashboard/applicants.html', context)
 
+    def post(self, request):
+        user = request.user
+        applicant_id = request.POST.get('applicant_id')
+        applicant = PostApply.objects.get(id = applicant_id)
+        post = Post.objects.get(id = applicant.post.id)
+        applicant.is_approved = True
+        UserConversation.objects.create(post = post, message_by = user, applicant = applicant) 
+        applicant.save()
+        return redirect('applicants')
+
+class UserConversationView(View):
+    def get(self, request):
+        user = request.user
+        chats = [conversation for conversation in UserConversation.objects.all() if conversation.applicant != user]
+        filtered_chats = []
+        unique_post_ids = set()
+        for conversation in chats:
+            post_id = conversation.post.id
+            if post_id not in unique_post_ids:
+                unique_post_ids.add(post_id)
+                filtered_chats.append(conversation)
+        context = {
+            'filtered_chats' : filtered_chats
+        }
+        return render(request, 'dashboard/messages.html', context)
+
+class UserChatView(View):
+    def get(self, request, **kwargs):
+        user = request.user
+        post = Post.objects.get(id = kwargs['post_id'])
+        applicant = PostApply.objects.get(id = kwargs['applicant_id'])
+        chats = UserConversation.objects.filter(post = post, applicant = applicant)
+        context = {
+            'chats' : chats,
+            'applicant_name' : applicant.applied_by
+        }
+        return render(request, 'dashboard/userMessage.html', context)
+
+    def post(self, request, **kwargs):
+        post = Post.objects.get(id = kwargs['post_id'])
+        applicant = PostApply.objects.get(id = kwargs['applicant_id'])
+        message = request.POST['message']
+        chat = UserConversation(post = post, message_by = request.user , applicant = applicant, message = message,)
+        chat.save()
+        return redirect('userChat/{}/{}'.format(post.id, applicant.id))
+        # issue = Issue.objects.get(id=kwargs['id'])
+        # message_by = UserProfile.objects.get(username=request.user)
+        # message = request.POST.get('message')
+        # file = request.FILES.get('file')
+        # issue_status_form = IssueStatusForm(instance=issue, data=request.POST)
+        # if request.POST['form_num'] == '1':
+        #     if issue_status_form.is_valid():
+        #         issue_status_form.save()
+        # elif request.POST['form_num'] == '2':
+        #     if message == "":
+        #         issue_conversation = IssueConversation.objects.create(
+        #             issue=issue,
+        #             message_by=message_by,
+        #             file = file,
+        #             created_at=timezone.now(),
+        #             updated_at=timezone.now()
+        #         )
+        #     else:
+        #         issue_conversation = IssueConversation.objects.create(
+        #             issue=issue,
+        #             message_by=message_by,
+        #             message=message,
+        #             file = file,
+        #             created_at=timezone.now(),
+        #             updated_at=timezone.now()
+        #         )
+        #         issue_conversation.save()
+        
 
 
     

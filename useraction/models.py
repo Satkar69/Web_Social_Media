@@ -6,7 +6,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Post(models.Model):
     added_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255, blank=True, null=False)
     description = models.CharField(max_length=255, blank=True, null=False)
     media = models.FileField(upload_to='uploads/mediapost', blank=True, null=True)
     
@@ -29,7 +28,7 @@ class PostApply(models.Model):
     is_approved = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.bid_by.username
+        return self.applied_by.username + ' / ' + f'{self.id}'
 
 
 class PostReaction(models.Model):
@@ -39,3 +38,15 @@ class PostReaction(models.Model):
 
     def __str__(self) -> str:
         return 'reacted_by -' + ' ' + self.reacted_by.username + ' / ' + self.post.added_by.username + ' / ' + f'{self.post.id}' + ' / ' + self.post.description
+
+
+class UserConversation(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    message_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    applicant = models.ForeignKey(PostApply, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.message_by.username + ' / ' + f'{self.id}' + ' / ' + f'post - {self.post.description}'
+        

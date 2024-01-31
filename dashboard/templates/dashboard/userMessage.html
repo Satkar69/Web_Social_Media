@@ -1,0 +1,172 @@
+{% extends "dashboard/base.html" %}
+
+
+{% block container %}
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+
+  .chat-container {
+    max-width: 400px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .chat-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+    overflow-y: scroll;
+    max-height: 300px;
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+
+  .message.sender {
+    text-align: right;
+  }
+
+  .message.sender .message-body {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 10px 10px 0 10px;
+  }
+
+  .message.receiver .message-body {
+    background-color: #f2f2f2;
+    color: #333;
+    border-radius: 10px 10px 10px 0;
+  }
+
+  .message-body {
+    max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    display: inline-block;
+  }
+
+  .message-sender {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .chat-input {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
+
+  .chat-input input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+
+  .chat-input button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-header">{{ applicant_name }}</div>
+    <div class="chat-messages" id="chat-messages">
+        {% for chat in chats %}
+            {% if chat.message %}
+                {% if chat.message_by != user %}
+                    <div class="message receiver">
+                        <div class="message-body">{{ chat.message }}</div>
+                    </div>
+                {% else %}
+                    <div class="message sender">
+                        <div class="message-sender">You</div>
+                        <div class="message-body">{{ chat.message }}</div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="chat-input">
+            <input type="text" placeholder="Type your message..." name="message">
+            <button type="submit">Send</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function sendMessage() {
+        // Get the input value
+        var messageInput = document.querySelector('.chat-input input[type="text"]');
+        var messageText = messageInput.value.trim();
+
+        // Check if message is not empty
+        if (messageText !== '') {
+            // Create a new message element
+            var messageContainer = document.getElementById('chat-messages');
+            var newMessage = document.createElement('div');
+
+            // Determine message class based on sender
+            newMessage.className = chat.message_by != user ? 'message receiver' : 'message sender';
+            newMessage.innerHTML = `
+                <div class="message-sender">${chat.message_by != user ? chat.applicant.applied_by : 'You'}</div>
+                <div class="message-body">${messageText}</div>
+            `;
+            
+            // Append the new message to the chat container
+            messageContainer.appendChild(newMessage);
+
+            // Clear the input field
+            messageInput.value = '';
+
+            // Scroll to the bottom of the chat container
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+    }
+
+    // Automatically scroll down to the bottom of the chat container
+    function scrollToBottom() {
+        var messageContainer = document.getElementById('chat-messages');
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    // Call scrollToBottom when the page loads to ensure initial scroll position
+    window.onload = function() {
+        scrollToBottom();
+    };
+</script>
+
+
+</body>
+
+
+{% endblock container %}
