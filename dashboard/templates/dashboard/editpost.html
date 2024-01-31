@@ -1,0 +1,44 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block container %}
+    
+    <ul class="list-unstyled" style="margin-bottom: 0;">
+        <li class="media post-form w-shadow">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="media-body">
+                    <div class="form-group post-input">
+                        <textarea class="form-control" id="postForm" rows="2" placeholder="What's on your mind?" name="description" ">{{post.description}}</textarea>
+                    </div>
+                    <div class="row post-form-group">
+                        <div class="col-md-9">
+                            <button type="button" class="btn btn-link post-form-btn btn-sm">
+                                <div class="d-block mt-3"></div>
+                                {% if post.media %}
+                                    <a href="{{post.media.url}}">
+                                        <img src=" {{post.media.url}} " alt="post form icon">
+                                    </a>
+                                {% endif %}
+                                <input type="file" name="media" id="image" accept="image/*" ">
+                                <button type="button" id="clearButton">Clear</button>
+                            </button>
+                        </div>
+                        <div class="col-md-3 text-right">
+                            <button type="submit" class="btn btn-primary btn-sm">Publish</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+    </ul> 
+
+    <script>
+        document.getElementById("clearButton").addEventListener("click", function() {
+            var input = document.getElementById("image");
+            input.type = 'text'; // Change the type to text to clear the file input
+            input.type = 'file'; // Change it back to file to reset the input
+        });
+    </script>
+
+{% endblock  %}

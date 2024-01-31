@@ -97,7 +97,14 @@
 <body>
 
   <div class="chat-container">
-    <div class="chat-header">{{ applicant_name }}</div>
+    
+    <div class="chat-header">
+      {% if applicant == user %}
+        {{message_by}}
+      {% else %}
+        {{applicant}}
+      {% endif %}
+    </div>
     <div class="chat-messages" id="chat-messages">
         {% for chat in chats %}
             {% if chat.message %}

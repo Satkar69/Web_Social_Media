@@ -5,10 +5,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .mixin import LoginRequired
 from userprofile.models import UserProfile
-from useraction.models import Post, PostApply, PostComment, PostReaction
+from useraction.models import Post, PostApply, PostComment, PostReaction, UserConversation
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import *
 # # Create your views here.
 
 class CustomVariables:
@@ -67,16 +66,14 @@ class UserFeedView(LoginRequired, View):
     def get(self, request):
         user = request.user
         posts = Post.objects.all()
-        reactions = PostReaction.objects.all()
-        new_reactions = [reaction.post.id for reaction in reactions if reaction.reacted_by == user ]
+        applies = PostApply.objects.filter(applied_by = user)
+        filtered_applies = [i.post.id for i in applies]
         reacted_posts = PostReaction.objects.filter(reacted_by = user)
-        print(new_reactions)
         context = {
             'user' : user,
             'posts' : posts,
-            'reactions' : reactions,
             'reacted_posts' : reacted_posts,
-            'new_reactions' : new_reactions
+            'filtered_applies' : filtered_applies
         }
         return render(request, 'dashboard/userFeed.html', context)
      
@@ -116,23 +113,69 @@ class CreatePostView(LoginRequired, View):
         return redirect('userFeed')
 
 
+class EditPostView(LoginRequired, View):
+    def get(self, request, **kwargs):
+        post = Post.objects.get(id = kwargs['post_id'])
+        if request.user == post.added_by:
+            context = {
+                'post' : post
+            }
+            return render(request, 'dashboard/editpost.html', context)
+        else:
+            return redirect('userFeed')
     
-class ApplicantsView(View):
+    def post(self, request, **kwargs):
+        post = Post.objects.get(id = kwargs['post_id'])
+        description = request.POST['description']
+        if 'media' in request.FILES:
+            media = request.FILES['media']
+            post.description = description
+            post.media = media
+        else:
+            post.description = description
+        post.save()
+        return redirect('userFeed')
+
+
+class DeletePostView(View):
+    def get(self, request, **kwargs):
+        post = Post.objects.get(id = kwargs['post_id'])
+        if request.user == post.added_by:
+            post.delete()
+        return redirect('userFeed')
+
+    
+class ApplicantsView(LoginRequired, View):
+    # def get(self, request):
+    #     user = request.user
+    #     applicants = [applicant for applicant in PostApply.objects.all() if applicant.applied_by != user]
+    #     post_and_applicants = [(application.post.added_by, application.applied_by) for application in PostApply.objects.all()]
+    #     unpacked_users = [item for tuple in post_and_applicants for item in tuple]
+    #     if user not in unpacked_users:
+    #         data = False
+    #     elif user in unpacked_users:
+    #         data = True
+    #     filtered_applicants = []
+    #     unique_post_ids = set()
+    #     for applicant in applicants:
+    #         post_id = applicant.post.id
+    #         if post_id not in unique_post_ids:
+    #             unique_post_ids.add(post_id)
+    #             filtered_applicants.append(applicant)
+    #     context = {
+    #         'filtered_applicants' : filtered_applicants,    
+    #         'data' : data
+    #     }
+    #     return render(request, 'dashboard/applicants.html', context)
     def get(self, request):
         user = request.user
-        applicants = [applicant for applicant in PostApply.objects.all() if applicant.applied_by != user]
-        filtered_applicants = []
-        unique_post_ids = set()
-        for applicant in applicants:
-            post_id = applicant.post.id
-            if post_id not in unique_post_ids:
-                unique_post_ids.add(post_id)
-                filtered_applicants.append(applicant)
+        applicants = PostApply.objects.filter(post__added_by_id = user.id, is_approved = False)
         context = {
-            'filtered_applicants' : filtered_applicants
+            'applicants' : applicants
         }
         return render(request, 'dashboard/applicants.html', context)
 
+    
     def post(self, request):
         user = request.user
         applicant_id = request.POST.get('applicant_id')
@@ -142,24 +185,40 @@ class ApplicantsView(View):
         UserConversation.objects.create(post = post, message_by = user, applicant = applicant) 
         applicant.save()
         return redirect('applicants')
+    
 
-class UserConversationView(View):
+class UserConversationView(LoginRequired, View):
+    # def get(self, request):
+        # user = request.user
+        # chats = [conversation for conversation in UserConversation.objects.all() if conversation.applicant != user]
+        # posts_and_applicants = [(conversation.post.added_by, conversation.applicant.applied_by) for conversation in UserConversation.objects.all()]
+        # unpacked_users = set([item for tuple in posts_and_applicants for item in tuple])
+        # if user not in unpacked_users:
+        #     data = False
+        # elif user in unpacked_users:
+        #     data = True
+        # filtered_chats = []
+        # unique_post_ids = set()
+        # for conversation in chats:
+        #     post_id = conversation.post.id
+        #     if post_id not in unique_post_ids:
+        #         unique_post_ids.add(post_id)
+        #         filtered_chats.append(conversation)
+        # context = {
+        #     'filtered_chats' : filtered_chats,
+        #     'data' : data
+        # }
     def get(self, request):
         user = request.user
-        chats = [conversation for conversation in UserConversation.objects.all() if conversation.applicant != user]
-        filtered_chats = []
-        unique_post_ids = set()
-        for conversation in chats:
-            post_id = conversation.post.id
-            if post_id not in unique_post_ids:
-                unique_post_ids.add(post_id)
-                filtered_chats.append(conversation)
+        applicants = PostApply.objects.filter(post__added_by_id = user.id, is_approved = True)
         context = {
-            'filtered_chats' : filtered_chats
+            'applicants' : applicants
         }
+        print(applicants)
         return render(request, 'dashboard/messages.html', context)
+    
 
-class UserChatView(View):
+class UserChatView(LoginRequired, View):
     def get(self, request, **kwargs):
         user = request.user
         post = Post.objects.get(id = kwargs['post_id'])
@@ -167,8 +226,12 @@ class UserChatView(View):
         chats = UserConversation.objects.filter(post = post, applicant = applicant)
         context = {
             'chats' : chats,
-            'applicant_name' : applicant.applied_by
+            'message_by' : chats[0].message_by.username,
+            'applicant' : chats[0].applicant.applied_by,
+            'user' : user,
+
         }
+        print(context['message_by'], context['applicant'], user)
         return render(request, 'dashboard/userMessage.html', context)
 
     def post(self, request, **kwargs):
@@ -177,34 +240,7 @@ class UserChatView(View):
         message = request.POST['message']
         chat = UserConversation(post = post, message_by = request.user , applicant = applicant, message = message,)
         chat.save()
-        return redirect('userChat/{}/{}'.format(post.id, applicant.id))
-        # issue = Issue.objects.get(id=kwargs['id'])
-        # message_by = UserProfile.objects.get(username=request.user)
-        # message = request.POST.get('message')
-        # file = request.FILES.get('file')
-        # issue_status_form = IssueStatusForm(instance=issue, data=request.POST)
-        # if request.POST['form_num'] == '1':
-        #     if issue_status_form.is_valid():
-        #         issue_status_form.save()
-        # elif request.POST['form_num'] == '2':
-        #     if message == "":
-        #         issue_conversation = IssueConversation.objects.create(
-        #             issue=issue,
-        #             message_by=message_by,
-        #             file = file,
-        #             created_at=timezone.now(),
-        #             updated_at=timezone.now()
-        #         )
-        #     else:
-        #         issue_conversation = IssueConversation.objects.create(
-        #             issue=issue,
-        #             message_by=message_by,
-        #             message=message,
-        #             file = file,
-        #             created_at=timezone.now(),
-        #             updated_at=timezone.now()
-        #         )
-        #         issue_conversation.save()
+        return redirect('userChat', post_id=post.id, applicant_id=applicant.id)
         
 
 

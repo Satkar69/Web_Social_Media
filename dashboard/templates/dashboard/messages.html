@@ -87,6 +87,29 @@
   .btn:hover {
     background-color: #0056b3;
   }
+
+  .message-link {
+    text-decoration: none; /* Remove underline */
+}
+
+.message-button {
+    background-color: #007bff; /* Blue background color */
+    border: none; /* Remove border */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding */
+    text-align: center; /* Center text */
+    display: inline-block; /* Make it inline block */
+    font-size: 16px; /* Font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style */
+    transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.message-button:hover {
+    background-color: #0056b3; /* Darker blue background color on hover */
+}
+
+
 </style>
 </head>
 <body>
@@ -97,27 +120,27 @@
     <table>
       <thead>
         <tr>
-          <th>User ID</th>
+          <th>User</th>
           <th>For Post </th>
           <th>Applied_by</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        {% for chat in filtered_chats %}
-          <tr>
-              <td>{{chat.message_by.id}}</td>
-              <td>{{chat.post}}</td>
-              <td>{{chat.message_by}}</td>
-              <td>
-                <a href="/userChat/{{chat.post.id}}/{{chat.applicant.id}}">
-                  <button>
-                    Message
-                  </button>
-                </a>
-              </td>
-          </tr>
-        {% endfor %}
+          {% for applicant in applicants %}
+            <tr>
+                <td>{{applicant.post.added_by}}</td>
+                <td>{{applicant.post}}</td>
+                <td>{{applicant.applied_by}}</td>
+                <td>
+                  <a href="/userChat/{{applicant.post.id}}/{{applicant.id}}" class="message-link">
+                    <button class="message-button">
+                      Message
+                    </button>
+                  </a>
+                </td>
+            </tr>
+          {% endfor %}
         <!-- Add more rows as needed -->
       </tbody>
     </table>

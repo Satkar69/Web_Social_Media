@@ -28,7 +28,7 @@ class PostApply(models.Model):
     is_approved = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.applied_by.username + ' / ' + f'{self.id}'
+        return self.applied_by.username + ' / ' + f'{self.id}' + ' / ' + f'{self.post}'
 
 
 class PostReaction(models.Model):

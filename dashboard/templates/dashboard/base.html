@@ -31,6 +31,25 @@
     <link href="https://vjs.zencdn.net/7.4.1/video-js.css" rel="stylesheet">
     <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js" type="text/javascript"></script>
     <script src="{% static 'dashboard/internal/assets/js/load.js' %}" type="text/javascript"></script>
+
+    <style>
+        .faint-blue-button {
+            background-color: #f0f8ff; /* Faint blue color */
+            color: #333; /* Text color */
+            border: 2px solid #87CEFA; /* Border color */
+            border-radius: 20px; /* Curved border radius */
+            padding: 10px 20px; /* Padding */
+            font-size: 16px; /* Font size */
+            cursor: pointer; /* Cursor style */
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition */
+        }
+        
+        .faint-blue-button:hover {
+            background-color: #87CEFA; /* Change background color on hover */
+            color: #fff; /* Change text color on hover */
+            border-color: #87CEFA; /* Change border color on hover */
+        }
+    </style>
 </head>
 
 <body class="newsfeed">
@@ -60,101 +79,18 @@
                             </li>
                         </ul>
                         <ul class="navbar-nav mr-5 flex-row" id="main_menu">
-                            <a class="navbar-brand nav-item mr-lg-5" href="index.html"><img src="{% if user.profile_picture %} {{user.profile_picture.url}} {% endif %}" width="40" height="40" class="mr-3" alt="Logo"> : {{user}}</a>
-                            <!-- Collect the nav links, forms, and other content for toggling -->
-                            <form class="w-30 mx-2 my-auto d-inline form-inline mr-5 dropdown search-form">
-                                <div class="input-group" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="searchDropdown">
-                                    <input type="text" class="form-control search-input w-75" placeholder="Search for people, companies, events and more..." aria-label="Search" aria-describedby="search-addon">
-                                    <div class="input-group-append">
-                                        <button class="btn search-button" type="button"><i class='bx bx-search'></i></button>
-                                    </div>
-                                </div>
-                                <ul class="dropdown-menu notify-drop nav-drop shadow-sm" aria-labelledby="searchDropdown">
-                                    <div class="notify-drop-title">
-                                        <div class="row">
-                                            <div class="col-md-6 col-sm-6 col-xs-6 fs-8">Search Results <span class="badge badge-pill badge-primary ml-2">29</span></div>
-                                        </div>
-                                    </div>
-                                    <!-- end notify title -->
-                                    <!-- notify content -->
-                                    <div class="drop-content">
-                                        <h6 class="dropdown-header">Peoples</h6>
-                                        <li class="dropdown-item">
-                                            <div class="col-md-2 col-sm-2 col-xs-2">
-                                                <div class="notify-img">
-                                                    <img src="{% static 'dashboard/internal/assets/images/users/user-6.png' %}" alt="Search result">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-10 col-sm-10 col-xs-10">
-                                                <a href="#" class="notification-user">Susan P. Jarvis</a>
-                                                <a href="#" class="btn btn-quick-link join-group-btn border text-right float-right">
-                                                    Add Friend
-                                                </a>
-                                                <p class="time">6 Mutual friends</p>
-                                            </div>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <div class="col-md-2 col-sm-2 col-xs-2">
-                                                <div class="notify-img">
-                                                    <img src="{% static 'dashboard/internal/assets/images/users/user-5.png' %}" alt="Search result">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-10 col-sm-10 col-xs-10">
-                                                <a href="#" class="notification-user">Ruth D. Greene</a>
-                                                <a href="#" class="btn btn-quick-link join-group-btn border text-right float-right">
-                                                    Add Friend
-                                                </a>
-                                            </div>
-                                        </li>
-                                        <h6 class="dropdown-header">Groups</h6>
-                                        <li class="dropdown-item">
-                                            <div class="col-md-2 col-sm-2 col-xs-2">
-                                                <div class="notify-img">
-                                                    <img src="{% static 'dashboard/internal/assets/images/groups/group-2.jpg' %}" alt="Search result">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-10 col-sm-10 col-xs-10">
-                                                <a href="#" class="notification-user">Tourism</a>
-                                                <a href="#" class="btn btn-quick-link join-group-btn border text-right float-right">
-                                                    Join
-                                                </a>
-                                                <p class="time">2.5k Members 35+ post a week</p>
-                                            </div>
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <div class="col-md-2 col-sm-2 col-xs-2">
-                                                <div class="notify-img">
-                                                    <img src="{% static 'dashboard/internal/assets/images/groups/group-1.png' %}" alt="Search result">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-10 col-sm-10 col-xs-10">
-                                                <a href="#" class="notification-user">Argon Social Network <img src="{% static 'dashboard/internal/assets/images/theme/verify.png' %}" width="10px" class="verify" alt="Group verified"></a>
-                                                <a href="#" class="btn btn-quick-link join-group-btn border text-right float-right">
-                                                    Join
-                                                </a>
-                                                <p class="time">10k Members 20+ post a week</p>
-                                            </div>
-                                        </li>
-                                    </div>
-                                    <div class="notify-drop-footer text-center">
-                                        <a href="#">See More</a>
-                                    </div>
-                                </ul>
-                            </form>
+                            <a class="navbar-brand nav-item mr-lg-5" href="{% url 'userFeed' %}"><img src="{% if user.profile_picture %} {{user.profile_picture.url}} {% endif %}" width="40" height="40" class="mr-3" alt="Logo"> : {{user}}</a>
                             <li class="nav-item s-nav dropdown d-mobile">
                                 <a href="{% url 'createPost' %}" class="nav-link nav-icon nav-links drop-w-tooltip"  data-placement="bottom" data-title="Create" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <img src="{% static 'dashboard/internal/assets/images/icons/navbar/create.png' %}" alt="navbar icon">
+                                    <button class="faint-blue-button">Create Post</button>
                                 </a>
                             </li>
                                 
                             <li class="nav-item s-nav nav-icon dropdown">
                                 <a href="{% url 'logout' %}">
-                                    <button>
-                                        logout
-                                    </button>
+                                    <i class="fa-solid fa-arrow-right-from-bracket" style="color: darkred;"></i>
                                 </a>
                             </li>
-                            <button type="button" class="btn nav-link" id="menu-toggle"><img src="{% static 'dashboard/internal/assets/images/icons/theme/navs.png' %}" alt="Navbar navs"></button>
                         </ul>
 
                     </div>
@@ -176,7 +112,7 @@
                                     <!-- <span class="badge badge-primary badge-pill">2</span> -->
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center ">
-                                    <a href="{% url 'applicants' %}" class="sidebar-item"><i class="fa-solid fa-user-check" style="margin-right: 20px; color: blue;"></i> Applicants</a>
+                                    <a href="{% url 'applicants' %}" class="sidebar-item"><i class="fa-solid fa-user-check" style="margin-right: 15px; color: blue;"></i> Applicants</a>
                                     <!-- <span class="badge badge-primary badge-pill">17</span> -->
                                 </li>
                             </ul>

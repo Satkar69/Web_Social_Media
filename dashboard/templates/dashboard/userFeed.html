@@ -2,50 +2,7 @@
 {% load static %}
 
 {% block container %}
-        <!-- <div class="mb-3">
-            <div class="btn-group d-flex">
-                <a href="index.html" class="btn btn-quick-links mr-3 ql-active">
-                    <img src="{% static "dashboard/internal/assets/images/icons/theme/speech.png" %}" class="mr-2" alt="quick links icon">
-                    <span class="fs-8">Speech</span>
-                </a>
-                <a href="messages.html" class="btn btn-quick-links mr-3">
-                    <img src="{% static "dashboard/internal/assets/images/icons/theme/listen.png" %}" class="mr-2" alt="quick links icon">
-                    <span class="fs-8">Listen</span>
-                </a>
-                <a href="watch.html" class="btn btn-quick-links">
-                    <img src="{% static "dashboard/internal/assets/images/icons/theme/watch.png" %}" class="mr-2" alt="quick links icon">
-                    <span class="fs-8">Watch</span>
-                </a>
-            </div>
-        </div> --> 
-        <!-- <ul class="list-unstyled" style="margin-bottom: 0;">
-            <li class="media post-form w-shadow">
-                <div class="media-body">
-                    <div class="form-group post-input">
-                        <textarea class="form-control" id="postForm" rows="2" placeholder="What's on your mind, Arthur?"></textarea>
-                    </div>
-                    <div class="row post-form-group">
-                        <div class="col-md-9">
-                            <button type="button" class="btn btn-link post-form-btn btn-sm">
-                                <img src="{% static "dashboard/internal/assets/images/icons/theme/post-image.png" %}" alt="post form icon"> <span>Photo/Video</span>
-                            </button>
-                            <button type="button" class="btn btn-link post-form-btn btn-sm">
-                                <img src="{% static "dashboard/internal/assets/images/icons/theme/tag-friend.png" %}" alt="post form icon"> <span>Tag Friends</span>
-                            </button>
-                            <button type="button" class="btn btn-link post-form-btn btn-sm">
-                                <img src="{% static "dashboard/internal/assets/images/icons/theme/check-in.png" %}" alt="post form icon"> <span>Check In</span>
-                            </button>
-                        </div>
-                        <div class="col-md-3 text-right">
-                            <button type="button" class="btn btn-primary btn-sm">Publish</button>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>  -->
-
-
-
+        
         <!-- Like reaction button styling -->
         <style>
             .like-btn input[type="checkbox"] {
@@ -74,7 +31,53 @@
         }
       
         </style>
+        
+        <style>
+            /* Styling for like button */
+            .like-btn button[type="submit"] {
+                background-color: transparent; /* Transparent background */
+                border: none; /* Remove border */
+                padding: 0; /* Remove padding */
+                cursor: pointer; /* Change cursor to pointer */
+            }
+    
+            .like-btn button[type="submit"]:hover i {
+                color: blue; /* Change color on hover */
+            }
 
+            .like-btn button[type="submit"] i {
+                font-size: 24px; /* Adjust the font size as needed */
+            }
+    
+    
+            .apply-btn {
+                background-color: #007bff; /* Nice Blue */
+                border: none;
+                color: white;
+                padding: 10px 20px; /* Adjusted padding */
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 14px; /* Adjusted font size */
+                transition-duration: 0.4s;
+                cursor: pointer;
+                border-radius: 10px;
+              }
+              
+              .apply-btn:hover {
+                background-color: #0056b3; /* Darker Blue on Hover */
+              }
+    
+            /* Adjusting button position */
+            .argon-reaction {
+                display: flex; /* Use flexbox for alignment */
+                justify-content: space-between; /* Distribute items evenly */
+            }
+    
+            .argon-reaction .like-btn {
+                margin-right: 10px; /* Add margin between like and apply buttons */
+            }
+        </style>
 
 
 
@@ -92,47 +95,23 @@
                                                 <i class='bx bx-dots-horizontal-rounded'></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-                                                <a href="#" class="dropdown-item" aria-describedby="savePost">
+                                                <a href="/editpost/{{post.id}}" class="dropdown-item" >
                                                     <div class="row">
                                                         <div class="col-md-2">
-                                                            <i class='bx bx-bookmark-plus post-option-icon'></i>
+                                                            <i class="fa-solid fa-pen"></i>
                                                         </div>
                                                         <div class="col-md-10">
-                                                            <span class="fs-9">Save post</span>
-                                                            <small id="savePost" class="form-text text-muted">Add this to your saved items</small>
+                                                            <span class="fs-9">Edit Post</span>
                                                         </div>
                                                     </div>
                                                 </a>
-                                                <a href="#" class="dropdown-item" aria-describedby="hidePost">
+                                                <a href="/deletepost/{{post.id}}" class="dropdown-item" >
                                                     <div class="row">
                                                         <div class="col-md-2">
-                                                            <i class='bx bx-hide post-option-icon'></i>
+                                                            <i class="fa-solid fa-delete-left"></i>
                                                         </div>
                                                         <div class="col-md-10">
-                                                            <span class="fs-9">Hide post</span>
-                                                            <small id="hidePost" class="form-text text-muted">See fewer posts like this</small>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="#" class="dropdown-item" aria-describedby="snoozePost">
-                                                    <div class="row">
-                                                        <div class="col-md-2">
-                                                            <i class='bx bx-time post-option-icon'></i>
-                                                        </div>
-                                                        <div class="col-md-10">
-                                                            <span class="fs-9">Snooze Lina for 30 days</span>
-                                                            <small id="snoozePost" class="form-text text-muted">Temporarily stop seeing posts</small>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="#" class="dropdown-item" aria-describedby="reportPost">
-                                                    <div class="row">
-                                                        <div class="col-md-2">
-                                                            <i class='bx bx-block post-option-icon'></i>
-                                                        </div>
-                                                        <div class="col-md-10">
-                                                            <span class="fs-9">Report</span>
-                                                            <small id="reportPost" class="form-text text-muted">I'm concerned about this post</small>
+                                                            <span class="fs-9">Delete Post</span>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -155,21 +134,9 @@
                                 {% endif %}
                             </div>
                             <div class="mb-3">
-                                
+
                                 <!-- Reactions -->
                                 <div class="argon-reaction">
-                                    <!-- {% comment %} <form action="" method="post" id="form-post-{{post.id}}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="form-num" value="1">
-                                        <span class="like-btn">
-                                            <input type="hidden" name="form" value="reaction">
-                                            <input type="hidden" name="post_id" value="{{ post.id }}">
-                                            <button type="submit" class="sumbit-label" >
-                                                <i class='like-btn bx bxs-like mr-2 {% for reacted in reacted_posts %} {% if reacted.post.id == post.id and reacted.reacted_by == user and reacted.is_liked %} liked {% endif %} {% endfor %}' ></i>
-                                            </button>
-                                        </span>
-                                    </form> {% endcomment %} -->
-                                    
                                     <form action="" method="post" id="form-post-{{post.id}}">
                                         {% csrf_token %}
                                         <input type="hidden" name="form-num" value="1">
@@ -180,17 +147,19 @@
                                             </button>
                                         </span>
                                     </form>
-                                    {% if post.added_by != user %}
+                                    {% if post.id not in filtered_applies %}
+                                        {% if post.added_by != user  %}
                                         <form action="" method="post" id="form-post-{{post.id}}">
                                             {% csrf_token %}
                                             <input type="hidden" name="form-num" value="2">
                                             <span class="like-btn">
                                                 <input type="hidden" name="post_id" value="{{ post.id }}">
-                                                <button>
+                                                <button class="apply-btn">
                                                     Apply
                                                 </button>
                                             </span>
-                                        </form> `
+                                        </form> 
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>

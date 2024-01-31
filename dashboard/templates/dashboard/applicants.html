@@ -87,6 +87,26 @@
   .btn:hover {
     background-color: #0056b3;
   }
+
+  .approve-button {
+    background-color: #4CAF50; /* Green background color */
+    border: none; /* Remove border */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding */
+    text-align: center; /* Center text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Make it inline block */
+    font-size: 16px; /* Font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor style */
+    transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+.approve-button:hover {
+    background-color: #45a049; /* Darker green background color on hover */
+}
+
+
 </style>
 </head>
 <body>
@@ -104,24 +124,22 @@
         </tr>
       </thead>
       <tbody>
-        {% for applicant in filtered_applicants %}
-            {% if not applicant.is_approved %}
+          {% for applicant in applicants %}
                 <tr>
                     <td>{{applicant.applied_by.id}}</td>
                     <td>{{applicant.post}}</td>
                     <td>{{applicant.applied_by}}</td>
                     <td>
                         <form action="" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="applicant_id" value="{{applicant.id}}">
-                            <button type="submit">
-                                approve
-                            </button>
+                          {% csrf_token %}
+                          <input type="hidden" name="applicant_id" value="{{applicant.id}}">
+                          <button type="submit" class="approve-button">
+                            Approve
+                          </button>
                         </form>
                     </td>
                 </tr>
-            {% endif %}
-        {% endfor %}
+          {% endfor %}
         <!-- Add more rows as needed -->
       </tbody>
     </table>
