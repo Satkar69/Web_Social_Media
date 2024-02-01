@@ -7,7 +7,7 @@ from .mixin import LoginRequired
 from userprofile.models import UserProfile
 from useraction.models import Post, PostApply, PostComment, PostReaction, UserConversation
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.db.models import Q
 # # Create your views here.
 
 class CustomVariables:
@@ -145,7 +145,6 @@ class DeletePostView(View):
         return redirect('userFeed')
 
     
-class ApplicantsView(LoginRequired, View):
     # def get(self, request):
     #     user = request.user
     #     applicants = [applicant for applicant in PostApply.objects.all() if applicant.applied_by != user]
@@ -167,6 +166,8 @@ class ApplicantsView(LoginRequired, View):
     #         'data' : data
     #     }
     #     return render(request, 'dashboard/applicants.html', context)
+
+class ApplicantsView(LoginRequired, View):
     def get(self, request):
         user = request.user
         applicants = PostApply.objects.filter(post__added_by_id = user.id, is_approved = False)
@@ -187,7 +188,6 @@ class ApplicantsView(LoginRequired, View):
         return redirect('applicants')
     
 
-class UserConversationView(LoginRequired, View):
     # def get(self, request):
         # user = request.user
         # chats = [conversation for conversation in UserConversation.objects.all() if conversation.applicant != user]
@@ -208,9 +208,10 @@ class UserConversationView(LoginRequired, View):
         #     'filtered_chats' : filtered_chats,
         #     'data' : data
         # }
+class UserConversationView(LoginRequired, View):
     def get(self, request):
         user = request.user
-        applicants = PostApply.objects.filter(post__added_by_id = user.id, is_approved = True)
+        applicants = PostApply.objects.filter(Q(post__added_by_id = user.id) | Q(applied_by = user), is_approved = True)
         context = {
             'applicants' : applicants
         }
