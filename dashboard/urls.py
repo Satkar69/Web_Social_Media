@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('userFeed/', UserFeedView.as_view(), name='userFeed'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('changeProfilePic/', ChangeProfilePicView.as_view(), name='changeProfilePic'),
     path('createPost/', CreatePostView.as_view(), name='createPost'),
     path('applicants/', ApplicantsView.as_view(), name='applicants'),
     path('message/', UserConversationView.as_view(), name='message'),

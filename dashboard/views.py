@@ -61,6 +61,19 @@ class LogoutView(View):
         logout(request)
         return redirect('login')
     
+
+class ChangeProfilePicView(View):
+    def get(self, request):
+        return render(request, 'dashboard/changeProfilePic.html')
+    
+    def post(self, request):
+        user = request.user
+        if 'profile_picture' in request.FILES:
+            profile_picture = request.FILES['profile_picture']
+            user.profile_picture = profile_picture
+            user.save() 
+        return redirect('dashboard')
+    
         
 class UserFeedView(LoginRequired, View):
     def get(self, request):

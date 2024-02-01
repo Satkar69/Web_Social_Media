@@ -1,0 +1,29 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block container %}
+    
+    <ul class="list-unstyled" style="margin-bottom: 0;">
+        <li class="media post-form w-shadow">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="media-body">
+                    <div class="form-group post-input">
+                       
+                    </div>
+                    <div class="row post-form-group">
+                        <div class="col-md-9">
+                            <button type="button" class="btn btn-link post-form-btn btn-sm">
+                                <input type="file" name="profile_picture" id="image" accept="image/*">
+                            </button>
+                        </div>
+                        <div class="col-md-3 text-right">
+                            <button type="submit" class="btn btn-primary btn-sm">Change</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </li>
+    </ul> 
+
+{% endblock  %}
