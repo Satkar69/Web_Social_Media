@@ -245,7 +245,7 @@ class UserChatView(LoginRequired, View):
             'user' : user,
 
         }
-        print(context['message_by'], context['applicant'], user)
+        
         return render(request, 'dashboard/userMessage.html', context)
 
     def post(self, request, **kwargs):
